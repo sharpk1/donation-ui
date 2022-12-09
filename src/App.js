@@ -1,9 +1,21 @@
-import logo from "./logo.svg";
 import "./App.css";
-import Example from "./Example";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import Home from "./Home";
+import Reports from "./Reports";
 
 function App() {
-  return <Example />;
+  return (
+    <>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Home />}>
+            <Route index element={<Home />} />
+          </Route>
+          <Route path="/reports" element={<Reports />} />
+        </Routes>
+      </BrowserRouter>
+    </>
+  );
 }
 
 export default App;

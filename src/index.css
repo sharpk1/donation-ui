@@ -20,6 +20,34 @@ code {
   width: 1000px;
 }
 
-/* .modal-content {
-  width: 177% !important;
-} */
+.radio-group {
+  display: flex;
+  justify-content: space-between;
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 10px 0;
+}
+
+.form-member {
+  display: flex;
+  justify-content: space-between;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.member-info {
+  display: flex;
+  flex-direction: row;
+  place-content: center;
+}
+
+.member-info .form-member {
+  margin: 0;
+  max-width: 300px;
+}
+
+.member-info .rs-picker .rs-picker-toggle {
+  min-width: 300px;
+  min-height: 38px;
+  border-color: #ced4da;
+}

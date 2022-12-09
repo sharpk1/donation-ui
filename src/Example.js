@@ -4,7 +4,6 @@ import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Modal from "react-bootstrap/Modal";
-import Navbar from "./Navbar";
 
 const GridComplexExample = () => {
   const [show, setShow] = useState(false);
@@ -65,7 +64,6 @@ const GridComplexExample = () => {
 
   return (
     <>
-      <Navbar />
       <Form className="donation-form">
         <Row className="mb-3" style={{ textAlign: "center" }}>
           <Form.Group as={Col} controlId="formGridFirstName">

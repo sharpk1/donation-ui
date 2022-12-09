@@ -1,0 +1,6 @@
+1. Need to add functionality so that there is a droplist for members
+2. Need to add test members to the droplist 
+3. Need to implement date range picker 
+4. Need to implement specific time ranges
+5. Make the format of the table for how its supposed to be displayed 
+6. Reports by Member, show a table, show a time frame or like a date range time frame 
