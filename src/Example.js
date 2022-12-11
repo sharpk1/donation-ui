@@ -4,6 +4,8 @@ import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Modal from "react-bootstrap/Modal";
+import DonationTable from "./DonationTable";
+import moment from "moment";
 
 const GridComplexExample = () => {
   const [show, setShow] = useState(false);
@@ -12,33 +14,29 @@ const GridComplexExample = () => {
   const [donation, setDonation] = useState({
     firstName: "",
     lastName: "",
-    offering: 0,
-    tithes: 0,
-    mission: 0,
-    buildingFund: 0,
+    donationAmount: {
+      offering: 0,
+      tithes: 0,
+      mission: 0,
+      buildingFund: 0,
+    },
   });
 
   const onSaveHandler = () => {
-    console.log(donation);
     let newArr = [...num];
     newArr.push(donation);
     setNum(newArr);
     setDonation({
       firstName: "",
       lastName: "",
-      offering: 0,
-      tithes: 0,
-      mission: 0,
-      buildingFund: 0,
+      donationAmount: {
+        offering: 0,
+        tithes: 0,
+        mission: 0,
+        buildingFund: 0,
+      },
     });
-  };
-
-  const amountFormatter = (amount) => {
-    if (amount === 0) {
-      return "";
-    } else {
-      return `$${amount}`;
-    }
+    console.log(num);
   };
 
   const handleClose = () => {
@@ -54,16 +52,21 @@ const GridComplexExample = () => {
     setDonation({
       firstName: data.firstName,
       lastName: data.lastName,
-      offering: data.offering,
-      tithes: data.tithes,
-      mission: data.mission,
-      buildingFund: data.buildingFund,
+      offering: data.donationAmount.offering,
+      tithes: data.donationAmount.tithes,
+      mission: data.donationAmount.mission,
+      buildingFund: data.donationAmount.buildingFund,
     });
     setShow(true);
   };
 
+  const date = moment(new Date()).format("MM/DD/YYYY");
+
   return (
     <>
+      <h2 className="home-header" style={{ textAlign: "center" }}>
+        Donations from {date}
+      </h2>
       <Form className="donation-form">
         <Row className="mb-3" style={{ textAlign: "center" }}>
           <Form.Group as={Col} controlId="formGridFirstName">
@@ -90,11 +93,15 @@ const GridComplexExample = () => {
             <Form.Label>Offering</Form.Label>
             <Form.Control
               type="number"
-              value={donation["offering"]}
+              min="0"
+              value={donation?.donationAmount.offering}
               onChange={(e) => {
                 setDonation({
                   ...donation,
-                  offering: parseInt(e.target.value),
+                  donationAmount: {
+                    ...donation.donationAmount,
+                    offering: parseInt(e.target.value),
+                  },
                 });
               }}
             />
@@ -103,9 +110,16 @@ const GridComplexExample = () => {
             <Form.Label>Tithes</Form.Label>
             <Form.Control
               type="number"
-              value={donation["tithes"]}
+              min="0"
+              value={donation?.donationAmount.tithes}
               onChange={(e) => {
-                setDonation({ ...donation, tithes: parseInt(e.target.value) });
+                setDonation({
+                  ...donation,
+                  donationAmount: {
+                    ...donation.donationAmount,
+                    tithes: parseInt(e.target.value),
+                  },
+                });
               }}
             />
           </Form.Group>
@@ -113,9 +127,16 @@ const GridComplexExample = () => {
             <Form.Label>Mission</Form.Label>
             <Form.Control
               type="number"
-              value={donation["mission"]}
+              min="0"
+              value={donation?.donationAmount.mission}
               onChange={(e) => {
-                setDonation({ ...donation, mission: parseInt(e.target.value) });
+                setDonation({
+                  ...donation,
+                  donationAmount: {
+                    ...donation.donationAmount,
+                    mission: parseInt(e.target.value),
+                  },
+                });
               }}
             />
           </Form.Group>
@@ -123,11 +144,15 @@ const GridComplexExample = () => {
             <Form.Label>Building Fund</Form.Label>
             <Form.Control
               type="number"
-              value={donation["buildingFund"]}
+              min="0"
+              value={donation?.donationAmount.buildingFund}
               onChange={(e) => {
                 setDonation({
                   ...donation,
-                  buildingFund: parseInt(e.target.value),
+                  donationAmount: {
+                    ...donation.donationAmount,
+                    buildingFund: parseInt(e.target.value),
+                  },
                 });
               }}
             />
@@ -144,88 +169,7 @@ const GridComplexExample = () => {
           </Form.Group>
         </Row>
       </Form>
-      <table className="table table-striped">
-        <thead>
-          <tr>
-            <th scope="col">#</th>
-            <th scope="col">First</th>
-            <th scope="col">Last</th>
-            <th scope="col">Offering</th>
-            <th scope="col">Tithes</th>
-            <th scope="col">Mission</th>
-            <th scope="col">Building Fund</th>
-            <th scope="col">Edit?</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <th scope="row">1</th>
-            <td>Mark</td>
-            <td>Otto</td>
-            <td>$80</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>
-              {/* <Button variant="primary" onClick={handleShow}>
-                Edit
-              </Button> */}
-            </td>
-          </tr>
-          <tr>
-            <th scope="row">2</th>
-            <td>Jacob</td>
-            <td>Thornton</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>
-              {/* <Button variant="primary" onClick={handleShow}>
-                Edit
-              </Button> */}
-            </td>
-          </tr>
-          <tr>
-            <th scope="row">3</th>
-            <td>Larry</td>
-            <td>Bird</td>
-            <td></td>
-            <td>$25</td>
-            <td></td>
-            <td></td>
-            <td>
-              {/* <Button variant="primary" onClick={handleShow}>
-                Edit
-              </Button> */}
-            </td>
-          </tr>
-          {num.map((data) => {
-            return (
-              <tr>
-                <th scope="row">4</th>
-                <td>{data.firstName}</td>
-                <td>{data.lastName}</td>
-                <td>{amountFormatter(data.offering)}</td>
-                <td>{amountFormatter(data.tithes)}</td>
-                <td>{amountFormatter(data.mission)}</td>
-                <td>{amountFormatter(data.buildingFund)}</td>
-                <td>
-                  <Button
-                    variant="primary"
-                    onClick={() => {
-                      handleShow(data);
-                    }}
-                  >
-                    Edit
-                  </Button>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-
+      <DonationTable donationData={num} handleShow={handleShow} />
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
           <Modal.Title>Modal heading</Modal.Title>
