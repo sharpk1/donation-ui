@@ -67,6 +67,9 @@ const Reports = () => {
   const CheckExample = () => {
     const { check } = checkbox;
 
+    // Reset the table
+    // Remove who was the member from the state
+    //
     const handleChange = (e) => {
       e.persist();
 
@@ -94,14 +97,14 @@ const Reports = () => {
           onChange={handleChange}
           checked={check === "timeframe"}
         />
-        <Form.Check
+        {/* <Form.Check
           value={"custom"}
           type={"radio"}
           id={`custom-radio`}
           label={`Reports by Custom Date`}
           onChange={handleChange}
           checked={check === "custom"}
-        />
+        /> */}
       </Form>
     );
   };
@@ -158,6 +161,37 @@ const Reports = () => {
             }}>
               Get Data
             </Button> */}
+            <Button
+              variant="danger"
+              onClick={() => {
+                setDonor(-1);
+                setDonation([]);
+                setDateRange([null, null]);
+              }}
+            >
+              Clear Filters
+            </Button>
+          </div>
+          <DonationTable donationData={donation} />
+        </>
+      )}
+      {checkbox.check === "timeframe" && (
+        <>
+          <div className="member-info">
+            <DateRangePicker
+              format={"MM/dd/yyyy"}
+              onClean={() => {
+                setDateRange([null, null]);
+              }}
+              value={dateRange}
+              onOk={dateRangeHandler}
+              className="datepicker-member"
+            />
+            {/* <Button variant="primary" onClick={() => {
+
+          }}>
+            Get Data
+          </Button> */}
             <Button
               variant="danger"
               onClick={() => {
