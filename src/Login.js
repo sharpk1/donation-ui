@@ -1,5 +1,27 @@
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { UserAuth } from "./Auth";
+
 const Login = (props) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+  const { signIn } = UserAuth();
+
+  const handleSubmit = async (e) => {
+    console.log(signIn);
+    e.preventDefault();
+    setError("");
+    try {
+      await signIn(email, password);
+      navigate("/home");
+    } catch (e) {
+      setError(e.message);
+      console.log(e.message);
+    }
+  };
+
   return (
     <div className="Auth-form-container">
       <form className="Auth-form">
@@ -8,6 +30,7 @@ const Login = (props) => {
           <div className="form-group mt-3">
             <label>Email address</label>
             <input
+              onChange={(e) => setEmail(e.target.value)}
               type="email"
               className="form-control mt-1"
               placeholder="Enter email"
@@ -16,13 +39,18 @@ const Login = (props) => {
           <div className="form-group mt-3">
             <label>Password</label>
             <input
+              onChange={(e) => setPassword(e.target.value)}
               type="password"
               className="form-control mt-1"
               placeholder="Enter password"
             />
           </div>
           <div className="d-grid gap-2 mt-3">
-            <button type="submit" className="btn btn-primary">
+            <button
+              type="submit"
+              onClick={handleSubmit}
+              className="btn btn-primary"
+            >
               Submit
             </button>
           </div>

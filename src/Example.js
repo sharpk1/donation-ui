@@ -64,9 +64,7 @@ const GridComplexExample = () => {
 
   return (
     <>
-      <h2 className="home-header" style={{ textAlign: "center" }}>
-        Donations from {date}
-      </h2>
+      <div className="reports-header">Donations from {date}</div>
       <Form className="donation-form">
         <Row className="mb-3" style={{ textAlign: "center" }}>
           <Form.Group as={Col} controlId="formGridFirstName">
