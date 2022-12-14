@@ -4,13 +4,35 @@ import { amountFormatter } from "./logic";
 
 const DonationTable = (props) => {
   const { donationData, handleShow } = props;
-  console.log("donationData: ", donationData);
+
   const totals = {
     offering: 0,
     tithes: 0,
     mission: 0,
     buildingFund: 0,
   };
+
+  // const transformDonationData = (data) => {
+  //   let finalArray = [];
+  //   for (let i = 0; i < data.length; i++) {
+  //     // if the finalArray already has that person
+  //     if (getId(finalArray, data[i].id, false)) {
+  //       // find in finalArray where that person is
+  //       let index = getId(finalArray, data[i].id, true);
+
+  //       // go into donationAmount
+  //       for (const property in finalArray[index].donationAmount) {
+  //         finalArray[index].donationAmount[property] +=
+  //           data[i].donationAmount[property];
+  //       }
+  //     } else {
+  //       finalArray.push(data[i]);
+  //     }
+  //   }
+
+  //   return finalArray;
+  // };
+
   return (
     <table className="table table-striped">
       <thead>
@@ -22,7 +44,7 @@ const DonationTable = (props) => {
           <th scope="col">Tithes</th>
           <th scope="col">Mission</th>
           <th scope="col">Building Fund</th>
-          <th scope="col">Edit?</th>
+          <th scope="col">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -48,6 +70,15 @@ const DonationTable = (props) => {
                   }}
                 >
                   Edit
+                </Button>
+                <Button
+                  style={{ marginLeft: "5px" }}
+                  variant="danger"
+                  onClick={() => {
+                    handleShow(data);
+                  }}
+                >
+                  Delete
                 </Button>
               </td>
             </tr>

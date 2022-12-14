@@ -6,6 +6,8 @@ import "rsuite/dist/rsuite.min.css";
 import DonationTable from "./DonationTable";
 import { sampleDonations, sampleDonors } from "./sampleData";
 import moment from "moment";
+import { db } from "./firebase-config";
+import { doc, query, collection, where, getDocs } from "firebase/firestore";
 
 const Reports = () => {
   const startOfMonth = moment().startOf("month").format("YYYY-MM-DD hh:mm");
@@ -18,12 +20,41 @@ const Reports = () => {
     new Date(endOfMonth),
   ]);
 
+  // TODO: export this to its own logic.tsx
+  const getDonationById = async (id) => {
+    const categoryDocRef = doc(db, `/members/${id}`);
+
+    const q = query(
+      collection(db, "donation"),
+      where("donorId", "==", categoryDocRef)
+    );
+
+    const ticketDocsSnap = await getDocs(q);
+    const responseContent = ticketDocsSnap.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
+  };
+
+  const membersCollection = collection(db, "members");
+
   const onMemberSelect = (e) => {
     setDonor(parseInt(e.target.value));
   };
 
   useEffect(() => {
-    console.log(startOfMonth);
+    // const getMembers = async () => {
+    //   const data = await getDocs(membersCollection);
+    //   data.forEach((doc) => {
+    //     let values = null;
+    //     console.log(`${doc.id} => ${doc.data().firstName}`);
+    //     console.log(doc.data().lastName);
+    //     values = doc.id;
+    //   });
+    // };
+
+    getDonationById("BEt9v41FVR9MAeLSvsy9");
+
     const result = sampleDonations.filter((donation) => {
       if (donor !== -1) {
         return (
@@ -40,6 +71,7 @@ const Reports = () => {
     });
 
     setDonation(dataFormatter(result));
+    // getMembers();
   }, []);
 
   const SelectBasicExample = () => {
@@ -97,14 +129,6 @@ const Reports = () => {
           onChange={handleChange}
           checked={check === "timeframe"}
         />
-        {/* <Form.Check
-          value={"custom"}
-          type={"radio"}
-          id={`custom-radio`}
-          label={`Reports by Custom Date`}
-          onChange={handleChange}
-          checked={check === "custom"}
-        /> */}
       </Form>
     );
   };
@@ -211,8 +235,3 @@ const Reports = () => {
 };
 
 export default Reports;
-
-// [
-//   "2022-12-02T02:35:02.270Z",
-//   "2023-01-01T02:35:02.270Z"
-// ]

@@ -10,7 +10,6 @@ const Login = (props) => {
   const { signIn } = UserAuth();
 
   const handleSubmit = async (e) => {
-    console.log(signIn);
     e.preventDefault();
     setError("");
     try {
@@ -18,7 +17,6 @@ const Login = (props) => {
       navigate("/home");
     } catch (e) {
       setError(e.message);
-      console.log(e.message);
     }
   };
 

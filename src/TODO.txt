@@ -1,6 +1,26 @@
-1. Need to add functionality so that there is a droplist for members
-2. Need to add test members to the droplist 
-3. Need to implement date range picker 
-4. Need to implement specific time ranges
-5. Make the format of the table for how its supposed to be displayed 
-6. Reports by Member, show a table, show a time frame or like a date range time frame 
+1. Need to add functionality so that there is a droplist for members - done
+2. Need to add test members to the droplist - done
+3. Need to implement date range picker - done
+4. Need to implement specific time ranges - done
+5. Make the format of the table for how its supposed to be displayed - done
+6. Reports by Member, show a table, show a time frame or like a date range time frame - done
+
+Member {
+    id: 1,
+    firstName: Kush
+    lastName: Shah
+    active: true
+}
+
+Donation {
+    id: UUID?,
+    donorId: 1,
+    donationDate: Date,
+    donationAmount: {
+        offering: number,
+        tithes: number,
+        mission: number,
+        buildingFund: number
+    }
+}
+
