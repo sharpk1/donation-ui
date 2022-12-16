@@ -4,10 +4,18 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import { signOut } from "firebase/auth";
 import { auth } from "./firebase-config";
+import { useNavigate } from "react-router-dom";
 
 function BasicExample() {
+  const navigate = useNavigate();
   const logout = async () => {
-    await signOut(auth);
+    try {
+      await signOut(auth);
+      navigate("/");
+      console.log("You are logged out");
+    } catch (e) {
+      console.log(e.message);
+    }
   };
   return (
     <Navbar bg="light" expand="lg">

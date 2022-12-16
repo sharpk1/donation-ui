@@ -7,11 +7,11 @@ import Modal from "react-bootstrap/Modal";
 import DonationTable from "./DonationTable";
 import moment from "moment";
 import ComboBox from "./Autocomplete";
-import { db } from "./firebase-config";
-import { getDocs, collection } from "firebase/firestore";
+import { getMembers } from "./logic";
+// import { db } from "./firebase-config";
+// import { getDocs, collection } from "firebase/firestore";
 
-//TODO: Rename this component to something more meaningful
-const GridComplexExample = () => {
+const Donation = () => {
   const [selectedMember, setSelectedMember] = useState({
     firstName: "",
     lastName: "",
@@ -33,22 +33,21 @@ const GridComplexExample = () => {
   });
 
   useEffect(() => {
-    const getMembers = async () => {
-      const membersCollection = collection(db, "members");
-      const data = await getDocs(membersCollection);
-      const responseContent = data.docs.map((doc) => ({
-        ...doc.data(),
-        id: doc.id,
-      }));
-      console.log(responseContent);
-      setOptions(responseContent);
-    };
-    getMembers();
+    getMembers()
+      .then((result) => {
+        const activeMembers = result.filter((member) => {
+          return member.isActive === true;
+        });
+        setOptions(activeMembers);
+      })
+      .catch((err) => {
+        console.error(err);
+        setOptions([]);
+      });
   }, []);
 
   const onSaveHandler = () => {
     let newArr = [...num];
-    console.log(donation);
     donation.donorId = selectedMember.donorId;
     donation.firstName = selectedMember.firstName;
     donation.lastName = selectedMember.lastName;
@@ -109,8 +108,8 @@ const GridComplexExample = () => {
       donorId: "",
     });
     setSelectedMember({
-      firstName: e.label,
-      lastName: e.label,
+      firstName: e.firstName,
+      lastName: e.lastName,
       donorId: e.id,
     });
   };
@@ -197,6 +196,7 @@ const GridComplexExample = () => {
               onClick={() => {
                 onSaveHandler();
               }}
+              disabled={selectedMember.donorId === ""}
               variant="success"
             >
               Save
@@ -306,4 +306,4 @@ const GridComplexExample = () => {
   );
 };
 
-export default GridComplexExample;
+export default Donation;

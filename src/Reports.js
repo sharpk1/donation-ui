@@ -4,10 +4,10 @@ import { Form, Button } from "react-bootstrap";
 import { DateRangePicker } from "rsuite";
 import "rsuite/dist/rsuite.min.css";
 import DonationTable from "./DonationTable";
-import { sampleDonations, sampleDonors } from "./sampleData";
 import moment from "moment";
 import { db } from "./firebase-config";
-import { doc, query, collection, where, getDocs } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
+import { getDonationById } from "./logic";
 
 const Reports = () => {
   const [options, setOptions] = useState([]);
@@ -22,23 +22,7 @@ const Reports = () => {
     new Date(endOfMonth),
   ]);
 
-  // TODO: export this to its own logic.tsx
-  const getDonationById = async (id) => {
-    const categoryDocRef = doc(db, `/members/${id}`);
-
-    const q = query(
-      collection(db, "donation"),
-      where("donorId", "==", categoryDocRef)
-    );
-
-    const ticketDocsSnap = await getDocs(q);
-    const responseContent = ticketDocsSnap.docs.map((doc) => ({
-      ...doc.data(),
-      id: doc.id,
-    }));
-  };
-
-  const membersCollection = collection(db, "members");
+  // const membersCollection = collection(db, "members");
 
   const onMemberSelect = (e) => {
     setDonor(e.target.value);
@@ -59,9 +43,7 @@ const Reports = () => {
 
   const getId = (array, id, isIndex) => {
     for (var i = 0, len = array.length; i < len; i++) {
-      console.log(array[i].donorId.id);
       if (array[i].donorId.id === id) {
-        // return array[i];
         if (isIndex) {
           return i;
         } else {
@@ -72,37 +54,59 @@ const Reports = () => {
     return false; // Nothing found
   };
 
-  useEffect(() => {
-    // getDonationById("BEt9v41FVR9MAeLSvsy9");
+  const getDonations = async () => {
+    const donationCollection = collection(db, "donation");
+    const data = await getDocs(donationCollection);
+    const responseContent = data.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
 
-    const getDonations = async () => {
-      const donationCollection = collection(db, "donation");
-      const data = await getDocs(donationCollection);
-      const responseContent = data.docs.map((doc) => ({
-        ...doc.data(),
-        id: doc.id,
-      }));
+    const final = [];
 
-      const final = [];
-
-      responseContent.forEach((donation, i) => {
-        console.log(donation);
-        if (getId(final, donation.donorId.id, false)) {
-          let index = getId(final, donation.donorId.id, true);
-          for (const property in donation.donationAmount) {
-            final[index].donationAmount[property] +=
-              donation.donationAmount[property];
-          }
-        } else {
-          console.log("PUSHED: ", donation);
-          final.push(donation);
+    responseContent.forEach((donation, i) => {
+      if (getId(final, donation.donorId.id, false)) {
+        let index = getId(final, donation.donorId.id, true);
+        for (const property in donation.donationAmount) {
+          final[index].donationAmount[property] +=
+            donation.donationAmount[property];
         }
-      });
+      } else {
+        final.push(donation);
+      }
+    });
+    console.log(final);
+    setDonations(final);
+  };
 
-      console.log(final);
+  useEffect(() => {
+    console.log("useEffect");
+    getDonationById("BEt9v41FVR9MAeLSvsy9");
 
-      setDonations(final);
-    };
+    // const getDonations = async () => {
+    //   const donationCollection = collection(db, "donation");
+    //   const data = await getDocs(donationCollection);
+    //   const responseContent = data.docs.map((doc) => ({
+    //     ...doc.data(),
+    //     id: doc.id,
+    //   }));
+
+    //   const final = [];
+
+    //   responseContent.forEach((donation, i) => {
+    //     if (getId(final, donation.donorId.id, false)) {
+    //       let index = getId(final, donation.donorId.id, true);
+    //       for (const property in donation.donationAmount) {
+    //         final[index].donationAmount[property] +=
+    //           donation.donationAmount[property];
+    //       }
+    //     } else {
+    //       final.push(donation);
+    //     }
+    //   });
+
+    //   setDonations(final);
+    // };
 
     getDonations();
 
@@ -121,12 +125,10 @@ const Reports = () => {
       }
     });
 
-    console.log("result: ", result);
-
     setDonation(dataFormatter(result));
-    console.log("inside useeffect");
+
     // getMembers();
-  }, [donor]);
+  }, [donor, checkbox.check]);
 
   const SelectBasicExample = () => {
     return (
@@ -160,7 +162,8 @@ const Reports = () => {
     //
     const handleChange = (e) => {
       e.persist();
-
+      setDonations([]);
+      setDonor(-1);
       setCheckbox((prevState) => ({
         ...prevState,
         check: e.target.value,
@@ -199,24 +202,28 @@ const Reports = () => {
 
   const dateRangeHandler = (date) => {
     setDateRange(date);
-    const [beginDate, endDate] = date;
-    const result = sampleDonations.filter((donation) => {
+    console.log(startOfMonth, endOfMonth);
+    console.log("donor: ", donor);
+    getDonations(); // problematic
+    console.log(donations);
+    const result = donations.filter((donation) => {
       if (donor !== -1) {
         return (
-          moment(donation.donationDate) >= beginDate &&
-          moment(donation.donationDate) <= endDate &&
-          donation.donorId === donor
+          donation.donationDate.toDate() >= new Date(startOfMonth) &&
+          donation.donationDate.toDate() <= new Date(endOfMonth) &&
+          donation.donorId.id === donor
         );
       } else {
         return (
-          moment(donation.donationDate) >= beginDate &&
-          moment(donation.donationDate) <= endDate
+          donation.donationDate.toDate() >= new Date(startOfMonth) &&
+          donation.donationDate.toDate() <= new Date(endOfMonth)
         );
       }
     });
-
     setDonation(dataFormatter(result));
   };
+
+  console.log(donation);
 
   return (
     <div>

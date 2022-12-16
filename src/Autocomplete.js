@@ -1,40 +1,47 @@
-import * as React from "react";
+import React, { useState } from "react";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 
 const ComboBox = (props) => {
   const { options, memberSelect } = props;
+  const [selectedMember, setSelectedMember] = useState(null);
 
-  const transformOptions = (data) => {
-    let final = [];
-    data.forEach((donor) => {
-      let name = `${donor.firstName} ${donor.lastName}`;
-      let id = donor.id;
-      final.push({
-        label: name,
-        id: id,
-      });
-    });
-    return final;
-  };
+  // useEffect(() => {
+  //   const close = document.getElementsByClassName(
+  //     "MuiAutocomplete-clearIndicator"
+  //   )[0];
+  //   // Add a Click Event Listener to the button
+  //   // close.addEventListener("click", () => {
+  //   //   alert("Add your Own Functionality Here...");
+  //   // });
+  //   const hey = () => {
+  //     console.log("bruh");
+  //   };
+  //   if (close) {
+  //     close.addEventListener("click", hey, false);
+  //   }
+  // }, [selectedMember]);
 
-  console.log(transformOptions(options));
+  console.log(options);
 
   return (
     <div className="autocomplete-members">
       <Autocomplete
         onChange={(_event, newValue) => {
-          console.log(newValue);
+          setSelectedMember(newValue);
           memberSelect(newValue);
-          console.log(JSON.stringify(newValue, null, " "));
         }}
+        value={selectedMember}
         disablePortal
         id="combo-box-demo"
-        options={transformOptions(options)}
+        options={options}
         sx={{ width: 300 }}
         renderInput={(params) => (
           <TextField {...params} label="Member" size="small" />
         )}
+        getOptionLabel={(option) => {
+          return `${option.firstName} ${option.lastName}`;
+        }}
         isOptionEqualToValue={(option, value) => option.id === value.id}
       />
     </div>
