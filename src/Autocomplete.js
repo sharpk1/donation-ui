@@ -3,8 +3,7 @@ import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 
 const ComboBox = (props) => {
-  const { options } = props;
-  console.log("options: ", options);
+  const { options, memberSelect } = props;
 
   const transformOptions = (data) => {
     let final = [];
@@ -18,24 +17,25 @@ const ComboBox = (props) => {
     });
     return final;
   };
-  // Top 100 films as rated by IMDb users. http://www.imdb.com/chart/top
-  // const options = [
-  //   { label: "Kush Shah", id: 1 },
-  //   { label: "Tom Smith", id: 2 },
-  //   { label: "John Doe", id: 3 },
-  // ];
+
+  console.log(transformOptions(options));
 
   return (
     <div className="autocomplete-members">
       <Autocomplete
+        onChange={(_event, newValue) => {
+          console.log(newValue);
+          memberSelect(newValue);
+          console.log(JSON.stringify(newValue, null, " "));
+        }}
         disablePortal
         id="combo-box-demo"
         options={transformOptions(options)}
         sx={{ width: 300 }}
-        // style={{ maxHeight: "38px" }}
         renderInput={(params) => (
           <TextField {...params} label="Member" size="small" />
         )}
+        isOptionEqualToValue={(option, value) => option.id === value.id}
       />
     </div>
   );

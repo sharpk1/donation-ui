@@ -1,9 +1,14 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
 import { amountFormatter } from "./logic";
+import moment from "moment";
+import { db } from "./firebase-config";
+import { doc, query, collection, where, getDocs } from "firebase/firestore";
 
 const DonationTable = (props) => {
-  const { donationData, handleShow } = props;
+  const { donationData, handleShow, donorSelected, startOfMonth, endOfMonth } =
+    props;
+  const [donations, setDonations] = useState([]);
 
   const totals = {
     offering: 0,
@@ -12,27 +17,56 @@ const DonationTable = (props) => {
     buildingFund: 0,
   };
 
-  // const transformDonationData = (data) => {
-  //   let finalArray = [];
-  //   for (let i = 0; i < data.length; i++) {
-  //     // if the finalArray already has that person
-  //     if (getId(finalArray, data[i].id, false)) {
-  //       // find in finalArray where that person is
-  //       let index = getId(finalArray, data[i].id, true);
+  // const getDonations = async () => {
+  //   const donationCollection = collection(db, "donation");
+  //   const data = await getDocs(donationCollection);
+  //   const responseContent = data.docs.map((doc) => ({
+  //     ...doc.data(),
+  //     id: doc.id,
+  //   }));
+  //   setDonations(responseContent);
+  // };
 
-  //       // go into donationAmount
-  //       for (const property in finalArray[index].donationAmount) {
-  //         finalArray[index].donationAmount[property] +=
+  // useEffect(() => {
+  //   setDonations(donationData);
+  // }, [donorSelected]);
+
+  // const findById = (source, id, isIndex) => {
+  //   if (source.length === 0) {
+  //     return false;
+  //   }
+  //   for (var i = 0; i < source.length; i++) {
+  //     console.log(source[i].donorId.id === id, ": hey");
+  //     if (source[i].donorId.id === id) {
+  //       if (isIndex) {
+  //         return i;
+  //       } else {
+  //         return true;
+  //       }
+  //     }
+  //   }
+  // };
+
+  // const dataTransform = (data) => {
+  //   const final = [];
+  //   for (let i = 0; i < data.length; i++) {
+  //     console.log(data[i].firstName);
+  //     console.log(findById(final, data[i].donorId.id, false));
+  //     if (findById(final, data[i].donorId.id, false)) {
+  //       const index = findById(final, data[i].donorId.id, true);
+  //       console.log("index: ", index);
+  //       for (const property in data[i].donationAmount) {
+  //         final[index].donationAmount[property] +=
   //           data[i].donationAmount[property];
   //       }
   //     } else {
-  //       finalArray.push(data[i]);
+  //       final.push(data[i]);
   //     }
   //   }
-
-  //   return finalArray;
+  //   return final;
   // };
 
+  console.log(donationData);
   return (
     <table className="table table-striped">
       <thead>
@@ -48,14 +82,14 @@ const DonationTable = (props) => {
         </tr>
       </thead>
       <tbody>
-        {donationData?.map((data) => {
+        {donationData.map((data) => {
           totals.offering += data.donationAmount.offering;
           totals.tithes += data.donationAmount.tithes;
           totals.mission += data.donationAmount.mission;
           totals.buildingFund += data.donationAmount.buildingFund;
           return (
             <tr>
-              <th scope="row">{data.donorId}</th>
+              <th scope="row">{data.donorId.id}</th>
               <td>{data.firstName}</td>
               <td>{data.lastName}</td>
               <td>{amountFormatter(data.donationAmount.offering)}</td>

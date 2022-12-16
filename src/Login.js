@@ -5,6 +5,7 @@ import { UserAuth } from "./Auth";
 const Login = (props) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  // TODO: remove this error or have the error display on the console
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const { signIn } = UserAuth();

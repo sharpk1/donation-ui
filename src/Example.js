@@ -10,11 +10,18 @@ import ComboBox from "./Autocomplete";
 import { db } from "./firebase-config";
 import { getDocs, collection } from "firebase/firestore";
 
+//TODO: Rename this component to something more meaningful
 const GridComplexExample = () => {
+  const [selectedMember, setSelectedMember] = useState({
+    firstName: "",
+    lastName: "",
+    donorId: "",
+  });
   const [show, setShow] = useState(false);
   const [options, setOptions] = useState([]);
   const [num, setNum] = useState([]);
   const [donation, setDonation] = useState({
+    donorId: "",
     firstName: "",
     lastName: "",
     donationAmount: {
@@ -33,6 +40,7 @@ const GridComplexExample = () => {
         ...doc.data(),
         id: doc.id,
       }));
+      console.log(responseContent);
       setOptions(responseContent);
     };
     getMembers();
@@ -40,8 +48,13 @@ const GridComplexExample = () => {
 
   const onSaveHandler = () => {
     let newArr = [...num];
+    console.log(donation);
+    donation.donorId = selectedMember.donorId;
+    donation.firstName = selectedMember.firstName;
+    donation.lastName = selectedMember.lastName;
     newArr.push(donation);
     setNum(newArr);
+
     setDonation({
       firstName: "",
       lastName: "",
@@ -89,6 +102,19 @@ const GridComplexExample = () => {
 
   const date = moment(new Date()).format("MM/DD/YYYY");
 
+  const memberSelect = (e) => {
+    setSelectedMember({
+      firstName: "",
+      lastName: "",
+      donorId: "",
+    });
+    setSelectedMember({
+      firstName: e.label,
+      lastName: e.label,
+      donorId: e.id,
+    });
+  };
+
   return (
     <>
       <div className="reports-header">Donations from {date}</div>
@@ -96,28 +122,8 @@ const GridComplexExample = () => {
         <Row className="mb-3" style={{ textAlign: "center" }}>
           <Form.Group as={Col} controlId="formGridMembers">
             <Form.Label>Members</Form.Label>
-            <ComboBox options={options} />
+            <ComboBox options={options} memberSelect={memberSelect} />
           </Form.Group>
-          {/* <Form.Group as={Col} controlId="formGridFirstName">
-            <Form.Label>First Name</Form.Label>
-            <Form.Control
-              type="firstName"
-              value={donation["firstName"]}
-              onChange={(e) => {
-                setDonation({ ...donation, firstName: e.target.value });
-              }}
-            />
-          </Form.Group>
-          <Form.Group as={Col} controlId="formGridLastName">
-            <Form.Label>Last Name</Form.Label>
-            <Form.Control
-              type="lastName"
-              value={donation["lastName"]}
-              onChange={(e) => {
-                setDonation({ ...donation, lastName: e.target.value });
-              }}
-            />
-          </Form.Group> */}
           <Form.Group as={Col} controlId="formGridOffering">
             <Form.Label>Offering</Form.Label>
             <Form.Control

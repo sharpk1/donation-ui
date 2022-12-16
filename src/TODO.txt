@@ -7,8 +7,8 @@
 
 Member {
     id: 1,
-    firstName: Kush
-    lastName: Shah
+    firstName: John
+    lastName: Smith
     active: true
 }
 

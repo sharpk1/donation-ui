@@ -10,11 +10,13 @@ import { db } from "./firebase-config";
 import { doc, query, collection, where, getDocs } from "firebase/firestore";
 
 const Reports = () => {
+  const [options, setOptions] = useState([]);
   const startOfMonth = moment().startOf("month").format("YYYY-MM-DD hh:mm");
   const endOfMonth = moment().endOf("month").format("YYYY-MM-DD hh:mm");
   const [checkbox, setCheckbox] = useState({ check: "member" });
   const [donor, setDonor] = useState(-1);
   const [donation, setDonation] = useState([]);
+  const [donations, setDonations] = useState([]);
   const [dateRange, setDateRange] = useState([
     new Date(startOfMonth),
     new Date(endOfMonth),
@@ -39,28 +41,77 @@ const Reports = () => {
   const membersCollection = collection(db, "members");
 
   const onMemberSelect = (e) => {
-    setDonor(parseInt(e.target.value));
+    setDonor(e.target.value);
   };
 
   useEffect(() => {
-    // const getMembers = async () => {
-    //   const data = await getDocs(membersCollection);
-    //   data.forEach((doc) => {
-    //     let values = null;
-    //     console.log(`${doc.id} => ${doc.data().firstName}`);
-    //     console.log(doc.data().lastName);
-    //     values = doc.id;
-    //   });
-    // };
+    const getMembers = async () => {
+      const membersCollection = collection(db, "members");
+      const data = await getDocs(membersCollection);
+      const responseContent = data.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      }));
+      setOptions(responseContent);
+    };
+    getMembers();
+  }, []);
 
-    getDonationById("BEt9v41FVR9MAeLSvsy9");
+  const getId = (array, id, isIndex) => {
+    for (var i = 0, len = array.length; i < len; i++) {
+      console.log(array[i].donorId.id);
+      if (array[i].donorId.id === id) {
+        // return array[i];
+        if (isIndex) {
+          return i;
+        } else {
+          return true;
+        }
+      }
+    }
+    return false; // Nothing found
+  };
 
-    const result = sampleDonations.filter((donation) => {
+  useEffect(() => {
+    // getDonationById("BEt9v41FVR9MAeLSvsy9");
+
+    const getDonations = async () => {
+      const donationCollection = collection(db, "donation");
+      const data = await getDocs(donationCollection);
+      const responseContent = data.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      }));
+
+      const final = [];
+
+      responseContent.forEach((donation, i) => {
+        console.log(donation);
+        if (getId(final, donation.donorId.id, false)) {
+          let index = getId(final, donation.donorId.id, true);
+          for (const property in donation.donationAmount) {
+            final[index].donationAmount[property] +=
+              donation.donationAmount[property];
+          }
+        } else {
+          console.log("PUSHED: ", donation);
+          final.push(donation);
+        }
+      });
+
+      console.log(final);
+
+      setDonations(final);
+    };
+
+    getDonations();
+
+    const result = donations.filter((donation) => {
       if (donor !== -1) {
         return (
-          moment(donation.donationDate) >= new Date(startOfMonth) &&
-          moment(donation.donationDate) <= new Date(endOfMonth) &&
-          donation.donorId === donor
+          donation.donationDate.toDate() >= new Date(startOfMonth) &&
+          donation.donationDate.toDate() <= new Date(endOfMonth) &&
+          donation.donorId.id === donor
         );
       } else {
         return (
@@ -70,14 +121,19 @@ const Reports = () => {
       }
     });
 
+    console.log("result: ", result);
+
     setDonation(dataFormatter(result));
+    console.log("inside useeffect");
     // getMembers();
-  }, []);
+  }, [donor]);
 
   const SelectBasicExample = () => {
     return (
       <Form.Select
-        onChange={onMemberSelect}
+        onChange={(e) => {
+          onMemberSelect(e);
+        }}
         className="form-member"
         aria-label="Default select example"
         value={donor}
@@ -85,7 +141,7 @@ const Reports = () => {
         <option disabled value={-1} key={-1}>
           Member List
         </option>
-        {sampleDonors.map((donor) => {
+        {options?.map((donor) => {
           return (
             <option key={donor.id} value={donor.id}>
               {donor.firstName + " " + donor.lastName}
@@ -180,11 +236,7 @@ const Reports = () => {
               onOk={dateRangeHandler}
               className="datepicker-member"
             />
-            {/* <Button variant="primary" onClick={() => {
-
-            }}>
-              Get Data
-            </Button> */}
+            <Button variant="primary">Get Data</Button>
             <Button
               variant="danger"
               onClick={() => {
@@ -196,7 +248,7 @@ const Reports = () => {
               Clear Filters
             </Button>
           </div>
-          <DonationTable donationData={donation} />
+          <DonationTable donationData={donation} donorSelected={donor} />
         </>
       )}
       {checkbox.check === "timeframe" && (
