@@ -63,7 +63,7 @@ const Reports = () => {
     }));
 
     const final = [];
-
+    // TODO: need to implmement something with the date ran
     responseContent.forEach((donation, i) => {
       if (getId(final, donation.donorId.id, false)) {
         let index = getId(final, donation.donorId.id, true);
@@ -78,6 +78,8 @@ const Reports = () => {
     console.log(final);
     setDonations(final);
   };
+
+  // const retrieveAndSetDonations = () => {};
 
   useEffect(() => {
     console.log("useEffect");
@@ -107,14 +109,14 @@ const Reports = () => {
 
     //   setDonations(final);
     // };
-
+    // TODO: send this to a helper method
+    const [start, end] = dateRange;
     getDonations();
-
     const result = donations.filter((donation) => {
       if (donor !== -1) {
         return (
-          donation.donationDate.toDate() >= new Date(startOfMonth) &&
-          donation.donationDate.toDate() <= new Date(endOfMonth) &&
+          donation.donationDate.toDate() >= new Date(start) &&
+          donation.donationDate.toDate() <= new Date(end) &&
           donation.donorId.id === donor
         );
       } else {
@@ -124,6 +126,7 @@ const Reports = () => {
         );
       }
     });
+    console.log(result);
 
     setDonation(dataFormatter(result));
 
@@ -201,29 +204,27 @@ const Reports = () => {
   };
 
   const dateRangeHandler = (date) => {
+    const [start, end] = date;
     setDateRange(date);
-    console.log(startOfMonth, endOfMonth);
-    console.log("donor: ", donor);
-    getDonations(); // problematic
+    getDonations();
+    // make this into a helper method
     console.log(donations);
     const result = donations.filter((donation) => {
       if (donor !== -1) {
         return (
-          donation.donationDate.toDate() >= new Date(startOfMonth) &&
-          donation.donationDate.toDate() <= new Date(endOfMonth) &&
+          donation.donationDate.toDate() >= new Date(start) &&
+          donation.donationDate.toDate() <= new Date(end) &&
           donation.donorId.id === donor
         );
       } else {
         return (
-          donation.donationDate.toDate() >= new Date(startOfMonth) &&
-          donation.donationDate.toDate() <= new Date(endOfMonth)
+          donation.donationDate.toDate() >= new Date(start) &&
+          donation.donationDate.toDate() <= new Date(end)
         );
       }
     });
     setDonation(dataFormatter(result));
   };
-
-  console.log(donation);
 
   return (
     <div>
@@ -270,11 +271,14 @@ const Reports = () => {
               onOk={dateRangeHandler}
               className="datepicker-member"
             />
-            {/* <Button variant="primary" onClick={() => {
-
-          }}>
-            Get Data
-          </Button> */}
+            <Button
+              variant="primary"
+              onClick={() => {
+                console.log("test");
+              }}
+            >
+              Get Data
+            </Button>
             <Button
               variant="danger"
               onClick={() => {

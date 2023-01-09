@@ -5,6 +5,8 @@ import { aggregateCalculator, amountFormatter } from "./logic";
 const DonationTable = (props) => {
   const { donationData, handleShow } = props;
 
+  console.log("donationData: ", donationData);
+
   const totals = {
     offering: 0,
     tithes: 0,
