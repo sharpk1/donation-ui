@@ -208,7 +208,12 @@ Save Changes
             totals.tithes += data.donationAmount.tithes;
             totals.mission += data.donationAmount.mission;
             totals.buildingFund += data.donationAmount.buildingFund;
-            const newList = extractMember(data);
+
+            let newList;
+            if (individualDonations) {
+              newList = extractMember(data);
+            }
+
             console.log(newList);
             return (
               <>

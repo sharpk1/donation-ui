@@ -8,6 +8,8 @@ import DonationTable from "./DonationTable";
 import moment from "moment";
 import ComboBox from "./Autocomplete";
 import { getMembers } from "./logic";
+import { db } from "./firebase-config";
+import { collection, addDoc, doc, Timestamp } from "firebase/firestore";
 // import { db } from "./firebase-config";
 // import { getDocs, collection } from "firebase/firestore";
 
@@ -64,6 +66,41 @@ const Donation = () => {
         buildingFund: 0,
       },
     });
+  };
+
+  const Push = async () => {
+    // const hey = {
+    //   firstName: "Larry",
+    //   lastName: "Bird",
+    //   donationDate: Date.now(),
+    //   donationAmount: {
+    //     buildingFund: 10,
+    //     mission: 10,
+    //     offering: 10,
+    //     tithes: 10,
+    //   },
+    //   donorId: `/members/${selectedMember.donorId}`,
+    // };
+
+    // console.log(hey);
+
+    try {
+      const docRef = await addDoc(collection(db, "donation"), {
+        firstName: selectedMember.firstName,
+        lastName: selectedMember.lastName,
+        donationDate: new Date(),
+        donationAmount: {
+          buildingFund: 10,
+          mission: 10,
+          offering: 10,
+          tithes: 10,
+        },
+        donorId: doc(db, "members", `${selectedMember.donorId}`),
+      });
+      console.log("Document written with ID: ", docRef.id);
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
   };
 
   const handleClose = () => {
@@ -195,6 +232,7 @@ const Donation = () => {
             <Button
               onClick={() => {
                 onSaveHandler();
+                Push();
               }}
               disabled={selectedMember.donorId === ""}
               variant="success"

@@ -64,6 +64,7 @@ const Reports = () => {
     const final = [];
     const allDonations = [];
     responseContent.forEach((donation, i) => {
+      console.log(donation.donationDate);
       if (
         moment(donation.donationDate.toDate()).isSameOrAfter(start, "day") &&
         moment(donation.donationDate.toDate()).isSameOrBefore(end, "day")
