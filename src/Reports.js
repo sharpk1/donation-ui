@@ -21,8 +21,7 @@ const Reports = () => {
     new Date(startOfMonth),
     new Date(endOfMonth),
   ]);
-
-  // const membersCollection = collection(db, "members");
+  const [individualDonations, setIndividualDonations] = useState([]);
 
   const onMemberSelect = (e) => {
     setDonor(e.target.value);
@@ -54,7 +53,7 @@ const Reports = () => {
     return false; // Nothing found
   };
 
-  const getDonations = async () => {
+  const getDonations = async (start, end) => {
     const donationCollection = collection(db, "donation");
     const data = await getDocs(donationCollection);
     const responseContent = data.docs.map((doc) => ({
@@ -63,75 +62,88 @@ const Reports = () => {
     }));
 
     const final = [];
-    // TODO: need to implmement something with the date ran
+    const allDonations = [];
     responseContent.forEach((donation, i) => {
-      if (getId(final, donation.donorId.id, false)) {
-        let index = getId(final, donation.donorId.id, true);
-        for (const property in donation.donationAmount) {
-          final[index].donationAmount[property] +=
-            donation.donationAmount[property];
+      if (
+        moment(donation.donationDate.toDate()).isSameOrAfter(start, "day") &&
+        moment(donation.donationDate.toDate()).isSameOrBefore(end, "day")
+      ) {
+        allDonations.push(donation);
+        if (getId(final, donation.donorId.id, false)) {
+          let index = getId(final, donation.donorId.id, true);
+          for (const property in donation.donationAmount) {
+            final[index].donationAmount[property] +=
+              donation.donationAmount[property];
+          }
+        } else {
+          final.push(donation);
         }
-      } else {
-        final.push(donation);
       }
     });
-    console.log(final);
     setDonations(final);
+    setIndividualDonations(allDonations);
+
+    if (donor !== -1) {
+      const result = donations.filter((donation) => {
+        return donation.donorId.id === donor;
+      });
+      setDonation(dataFormatter(result));
+    } else {
+      setDonation(dataFormatter(final));
+    }
   };
 
-  // const retrieveAndSetDonations = () => {};
+  // useEffect(() => {
+  //   console.log("useEffect");
+  //   getDonationById("BEt9v41FVR9MAeLSvsy9");
 
-  useEffect(() => {
-    console.log("useEffect");
-    getDonationById("BEt9v41FVR9MAeLSvsy9");
+  //   // const getDonations = async () => {
+  //   //   const donationCollection = collection(db, "donation");
+  //   //   const data = await getDocs(donationCollection);
+  //   //   const responseContent = data.docs.map((doc) => ({
+  //   //     ...doc.data(),
+  //   //     id: doc.id,
+  //   //   }));
 
-    // const getDonations = async () => {
-    //   const donationCollection = collection(db, "donation");
-    //   const data = await getDocs(donationCollection);
-    //   const responseContent = data.docs.map((doc) => ({
-    //     ...doc.data(),
-    //     id: doc.id,
-    //   }));
+  //   //   const final = [];
 
-    //   const final = [];
+  //   //   responseContent.forEach((donation, i) => {
+  //   //     if (getId(final, donation.donorId.id, false)) {
+  //   //       let index = getId(final, donation.donorId.id, true);
+  //   //       for (const property in donation.donationAmount) {
+  //   //         final[index].donationAmount[property] +=
+  //   //           donation.donationAmount[property];
+  //   //       }
+  //   //     } else {
+  //   //       final.push(donation);
+  //   //     }
+  //   //   });
 
-    //   responseContent.forEach((donation, i) => {
-    //     if (getId(final, donation.donorId.id, false)) {
-    //       let index = getId(final, donation.donorId.id, true);
-    //       for (const property in donation.donationAmount) {
-    //         final[index].donationAmount[property] +=
-    //           donation.donationAmount[property];
-    //       }
-    //     } else {
-    //       final.push(donation);
-    //     }
-    //   });
+  //   //   setDonations(final);
+  //   // };
+  //   // TODO: send this to a helper method
+  //   const [start, end] = dateRange;
+  //   getDonations(start, end);
+  //   // const result = donations.filter((donation) => {
+  //   //   if (donor !== -1) {
+  //   //     return (
+  //   //       donation.donationDate.toDate() >= new Date(start) &&
+  //   //       donation.donationDate.toDate() <= new Date(end) &&
+  //   //       donation.donorId.id === donor
+  //   //     );
+  //   //   } else {
+  //   //     return (
+  //   //       moment(donation.donationDate) >= new Date(startOfMonth) &&
+  //   //       moment(donation.donationDate) <= new Date(endOfMonth)
+  //   //     );
+  //   //   }
+  //   // });
+  //   // console.log(result);
 
-    //   setDonations(final);
-    // };
-    // TODO: send this to a helper method
-    const [start, end] = dateRange;
-    getDonations();
-    const result = donations.filter((donation) => {
-      if (donor !== -1) {
-        return (
-          donation.donationDate.toDate() >= new Date(start) &&
-          donation.donationDate.toDate() <= new Date(end) &&
-          donation.donorId.id === donor
-        );
-      } else {
-        return (
-          moment(donation.donationDate) >= new Date(startOfMonth) &&
-          moment(donation.donationDate) <= new Date(endOfMonth)
-        );
-      }
-    });
-    console.log(result);
+  //   // setDonation(dataFormatter(result));
 
-    setDonation(dataFormatter(result));
-
-    // getMembers();
-  }, [donor, checkbox.check]);
+  //   // getMembers();
+  // }, [donor, checkbox.check]);
 
   const SelectBasicExample = () => {
     return (
@@ -162,7 +174,6 @@ const Reports = () => {
 
     // Reset the table
     // Remove who was the member from the state
-    //
     const handleChange = (e) => {
       e.persist();
       setDonations([]);
@@ -206,24 +217,7 @@ const Reports = () => {
   const dateRangeHandler = (date) => {
     const [start, end] = date;
     setDateRange(date);
-    getDonations();
-    // make this into a helper method
-    console.log(donations);
-    const result = donations.filter((donation) => {
-      if (donor !== -1) {
-        return (
-          donation.donationDate.toDate() >= new Date(start) &&
-          donation.donationDate.toDate() <= new Date(end) &&
-          donation.donorId.id === donor
-        );
-      } else {
-        return (
-          donation.donationDate.toDate() >= new Date(start) &&
-          donation.donationDate.toDate() <= new Date(end)
-        );
-      }
-    });
-    setDonation(dataFormatter(result));
+    getDonations(start, end);
   };
 
   return (
@@ -256,7 +250,11 @@ const Reports = () => {
               Clear Filters
             </Button>
           </div>
-          <DonationTable donationData={donation} donorSelected={donor} />
+          <DonationTable
+            donationData={donation}
+            donorSelected={donor}
+            individualDonations={individualDonations}
+          />
         </>
       )}
       {checkbox.check === "timeframe" && (
@@ -271,14 +269,7 @@ const Reports = () => {
               onOk={dateRangeHandler}
               className="datepicker-member"
             />
-            <Button
-              variant="primary"
-              onClick={() => {
-                console.log("test");
-              }}
-            >
-              Get Data
-            </Button>
+            <Button variant="primary">Get Data</Button>
             <Button
               variant="danger"
               onClick={() => {

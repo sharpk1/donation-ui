@@ -116,7 +116,7 @@ const Donation = () => {
 
   return (
     <>
-      <div className="reports-header">Donations from {date}</div>
+      <div className="reports-header">Donations for {date}</div>
       <Form className="donation-form">
         <Row className="mb-3" style={{ textAlign: "center" }}>
           <Form.Group as={Col} controlId="formGridMembers">
