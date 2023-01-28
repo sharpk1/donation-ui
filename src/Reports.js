@@ -34,7 +34,10 @@ const Reports = () => {
         ...doc.data(),
         id: doc.id,
       }));
-      setOptions(responseContent);
+      let filtered = responseContent.filter((donor) => {
+        return donor.isActive === true;
+      });
+      setOptions(filtered);
     };
     getMembers();
   }, []);

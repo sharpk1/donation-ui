@@ -123,3 +123,11 @@ label {
 .modal-content {
   width: fit-content !important;
 }
+
+.memberHeaderSection {
+  display: flex;
+}
+
+.memberHeaderSection .inactiveMembers {
+  margin-left: auto;
+}
