@@ -2,9 +2,8 @@ import React, { useState } from "react";
 import Button from "react-bootstrap/Button";
 import { aggregateCalculator, amountFormatter } from "./logic";
 import Modal from "react-bootstrap/Modal";
-import Col from "react-bootstrap/Col";
-import Form from "react-bootstrap/Form";
 import Table from "react-bootstrap/Table";
+import moment from "moment";
 
 const DonationTable = (props) => {
   const [show, setShow] = useState(false);
@@ -69,7 +68,7 @@ const DonationTable = (props) => {
               </tr>
             </thead>
             <tbody>
-              {newList.map((donation) => {
+              {newList.map((donation, i) => {
                 return (
                   <tr>
                     <td>{donation.firstName}</td>
@@ -132,7 +131,13 @@ Save Changes
           <Modal.Title>Viewing Donations</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Table striped bordered hover size="sm">
+          <Table
+            striped
+            bordered
+            hover
+            size="sm"
+            style={{ width: "max-content" }}
+          >
             <thead>
               <tr>
                 <th>Date</th>
@@ -147,30 +152,29 @@ Save Changes
               {newList.map((donation) => {
                 return (
                   <tr>
-                    <td>{donation.firstName}</td>
-                    <td>{donation.firstName}</td>
-                    <td>{donation.lastName}</td>
-                    <td>{donation.donationAmount.offering}</td>
+                    <td class="td">
+                      {moment(donation.donationDate.toDate()).format(
+                        "MM/DD/YYYY"
+                      )}
+                    </td>
+                    <td style={{ whiteSpace: "nowrap" }}>
+                      {donation.firstName} {donation.lastName}
+                    </td>
+                    <td align="right">
+                      ${donation.donationAmount.offering || 0}
+                    </td>
+                    <td align="right">
+                      ${donation.donationAmount.tithes || 0}
+                    </td>
+                    <td align="right">
+                      ${donation.donationAmount.mission || 0}
+                    </td>
+                    <td align="right">
+                      ${donation.donationAmount.buildingFund || 0}
+                    </td>
                   </tr>
                 );
               })}
-              <tr>
-                <td>1</td>
-                <td>Mark</td>
-                <td>Otto</td>
-                <td>@mdo</td>
-              </tr>
-              <tr>
-                <td>2</td>
-                <td>Jacob</td>
-                <td>Thornton</td>
-                <td>@fat</td>
-              </tr>
-              <tr>
-                <td>3</td>
-                <td colSpan={2}>Larry the Bird</td>
-                <td>@twitter</td>
-              </tr>
             </tbody>
           </Table>
         </Modal.Body>
@@ -203,7 +207,7 @@ Save Changes
           </tr>
         </thead>
         <tbody>
-          {donationData.map((data) => {
+          {donationData.map((data, i) => {
             totals.offering += data.donationAmount.offering;
             totals.tithes += data.donationAmount.tithes;
             totals.mission += data.donationAmount.mission;

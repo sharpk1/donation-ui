@@ -7,7 +7,6 @@ import DonationTable from "./DonationTable";
 import moment from "moment";
 import { db } from "./firebase-config";
 import { collection, getDocs } from "firebase/firestore";
-import { getDonationById } from "./logic";
 
 const Reports = () => {
   const [options, setOptions] = useState([]);
@@ -64,7 +63,6 @@ const Reports = () => {
     const final = [];
     const allDonations = [];
     responseContent.forEach((donation, i) => {
-      console.log(donation.donationDate);
       if (
         moment(donation.donationDate.toDate()).isSameOrAfter(start, "day") &&
         moment(donation.donationDate.toDate()).isSameOrBefore(end, "day")

@@ -119,3 +119,7 @@ label {
   margin-right: auto;
   width: 8em;
 }
+
+.modal-content {
+  width: fit-content !important;
+}
