@@ -21,6 +21,7 @@ const Donation = () => {
   const [options, setOptions] = useState([]);
   const [num, setNum] = useState([]);
   const [donation, setDonation] = useState({
+    donationId: "",
     donorId: "",
     firstName: "",
     lastName: "",
@@ -31,6 +32,7 @@ const Donation = () => {
       buildingFund: 0,
     },
   });
+  const [donationId, setDonationId] = useState("");
 
   useEffect(() => {
     getMembers()
@@ -46,11 +48,12 @@ const Donation = () => {
       });
   }, []);
 
-  const onSaveHandler = () => {
+  const onSaveHandler = (id) => {
     let newArr = [...num];
     donation.donorId = selectedMember.donorId;
     donation.firstName = selectedMember.firstName;
     donation.lastName = selectedMember.lastName;
+    donation.donationId = id;
     newArr.push(donation);
     setNum(newArr);
 
@@ -81,6 +84,7 @@ const Donation = () => {
         donorId: doc(db, "members", `${selectedMember.donorId}`),
       });
       console.log("Document written with ID: ", docRef.id);
+      onSaveHandler(docRef.id);
     } catch (e) {
       console.error("Error adding document: ", e);
     }
@@ -133,6 +137,8 @@ const Donation = () => {
       donorId: e.id,
     });
   };
+
+  console.log(num);
 
   return (
     <>
@@ -214,8 +220,8 @@ const Donation = () => {
           <Form.Group as={Col} style={{ alignSelf: "flex-end" }}>
             <Button
               onClick={() => {
-                onSaveHandler();
                 Push();
+                onSaveHandler();
               }}
               disabled={selectedMember.donorId === ""}
               variant="success"
@@ -225,7 +231,11 @@ const Donation = () => {
           </Form.Group>
         </Row>
       </Form>
-      <DonationTable donationData={num} handleShow={handleShow} />
+      <DonationTable
+        donationData={num}
+        handleShow={handleShow}
+        isDonation={true}
+      />
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
           <Modal.Title>Edit Donation</Modal.Title>

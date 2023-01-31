@@ -21,6 +21,7 @@ const Reports = () => {
     new Date(endOfMonth),
   ]);
   const [individualDonations, setIndividualDonations] = useState([]);
+  const [revisedDonations, setRevisedDonations] = useState([]);
 
   const onMemberSelect = (e) => {
     setDonor(e.target.value);
@@ -58,18 +59,29 @@ const Reports = () => {
   const getDonations = async (start, end) => {
     const donationCollection = collection(db, "donation");
     const data = await getDocs(donationCollection);
+
+    let tempAr = [];
+    data.docs.forEach((doc) => {
+      tempAr.push({
+        ...doc.data(),
+        id: doc.id,
+      });
+    });
+
     const responseContent = data.docs.map((doc) => ({
       ...doc.data(),
       id: doc.id,
     }));
-
+    const another = [];
     const final = [];
     const allDonations = [];
+
     responseContent.forEach((donation, i) => {
       if (
         moment(donation.donationDate.toDate()).isSameOrAfter(start, "day") &&
         moment(donation.donationDate.toDate()).isSameOrBefore(end, "day")
       ) {
+        another.push(donation);
         allDonations.push(donation);
         if (getId(final, donation.donorId.id, false)) {
           let index = getId(final, donation.donorId.id, true);
@@ -82,6 +94,18 @@ const Reports = () => {
         }
       }
     });
+
+    let filtered = tempAr.filter((donation) => {
+      if (
+        moment(donation.donationDate.toDate()).isSameOrAfter(start, "day") &&
+        moment(donation.donationDate.toDate()).isSameOrBefore(end, "day")
+      ) {
+        return donation;
+      }
+    });
+
+    setRevisedDonations(filtered);
+
     setDonations(final);
     setIndividualDonations(allDonations);
 
@@ -89,8 +113,10 @@ const Reports = () => {
       const result = donations.filter((donation) => {
         return donation.donorId.id === donor;
       });
+      console.log("RESULT: ", result);
       setDonation(dataFormatter(result));
     } else {
+      console.log("FINAL: ", final);
       setDonation(dataFormatter(final));
     }
   };
@@ -253,6 +279,8 @@ const Reports = () => {
             </Button>
           </div>
           <DonationTable
+            revisedDonations={revisedDonations}
+            isDonation={false}
             donationData={donation}
             donorSelected={donor}
             individualDonations={individualDonations}
@@ -283,7 +311,7 @@ const Reports = () => {
               Clear Filters
             </Button>
           </div>
-          <DonationTable donationData={donation} />
+          <DonationTable donationData={donation} isDonation={false} />
         </>
       )}
     </div>

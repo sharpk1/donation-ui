@@ -131,3 +131,13 @@ label {
 .memberHeaderSection .inactiveMembers {
   margin-left: auto;
 }
+
+.editableInput.form-control {
+  width: 75px !important;
+  text-align: left;
+}
+
+.edit-donation-form {
+  margin-bottom: auto;
+  white-space: nowrap;
+}
