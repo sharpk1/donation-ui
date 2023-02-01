@@ -76,10 +76,10 @@ const Donation = () => {
         lastName: selectedMember.lastName,
         donationDate: new Date(),
         donationAmount: {
-          buildingFund: 10,
-          mission: 10,
-          offering: 10,
-          tithes: 10,
+          buildingFund: donation.donationAmount.buildingFund,
+          mission: donation.donationAmount.mission,
+          offering: donation.donationAmount.offering,
+          tithes: donation.donationAmount.tithes,
         },
         donorId: doc(db, "members", `${selectedMember.donorId}`),
       });

@@ -23,6 +23,11 @@ const Reports = () => {
   const [individualDonations, setIndividualDonations] = useState([]);
   const [revisedDonations, setRevisedDonations] = useState([]);
 
+  useEffect(() => {
+    const [start, end] = dateRange;
+    getDonations(start, end);
+  }, [donor]);
+
   const onMemberSelect = (e) => {
     setDonor(e.target.value);
   };
@@ -57,6 +62,10 @@ const Reports = () => {
   };
 
   const getDonations = async (start, end) => {
+    console.log("donor: ", donor);
+    console.log("start: ", start);
+    console.log("end: ", end);
+
     const donationCollection = collection(db, "donation");
     const data = await getDocs(donationCollection);
 
@@ -72,16 +81,16 @@ const Reports = () => {
       ...doc.data(),
       id: doc.id,
     }));
-    const another = [];
+
     const final = [];
     const allDonations = [];
 
+    // truly an enigma of a code block
     responseContent.forEach((donation, i) => {
       if (
         moment(donation.donationDate.toDate()).isSameOrAfter(start, "day") &&
         moment(donation.donationDate.toDate()).isSameOrBefore(end, "day")
       ) {
-        another.push(donation);
         allDonations.push(donation);
         if (getId(final, donation.donorId.id, false)) {
           let index = getId(final, donation.donorId.id, true);
@@ -108,9 +117,10 @@ const Reports = () => {
 
     setDonations(final);
     setIndividualDonations(allDonations);
-
+    console.log("DONOR: ", donor);
     if (donor !== -1) {
-      const result = donations.filter((donation) => {
+      // THIS IS BEING CHANGED FROM donations.filter to final.filter
+      const result = final.filter((donation) => {
         return donation.donorId.id === donor;
       });
       console.log("RESULT: ", result);
@@ -266,7 +276,9 @@ const Reports = () => {
               onOk={dateRangeHandler}
               className="datepicker-member"
             />
-            <Button variant="primary">Get Data</Button>
+            <Button variant="primary" style={{ marginRight: "5px" }}>
+              Get Data
+            </Button>
             <Button
               variant="danger"
               onClick={() => {

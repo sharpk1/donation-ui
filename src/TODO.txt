@@ -24,3 +24,7 @@ Donation {
     }
 }
 
+1. Open date range 1/1 to 1/31
+2. Go to your name and hit onOk
+3. Set the range to 1/29 to 1/31 and hit onOk
+4. Was suppposed to update but instead BUG. 

@@ -35,6 +35,7 @@ const DonationTable = (props) => {
     isDonation,
     revisedDonations,
   } = props;
+
   console.log("individualDonations: ", individualDonations);
   console.log("donationData: ", donationData);
 
@@ -150,7 +151,11 @@ Save Changes
     console.log(donor);
     console.log(revisedDonations);
     const newList = extractMember(donor);
-    console.log(newList);
+
+    newList.sort((x, y) => {
+      return x.donationDate - y.donationDate;
+    });
+
     return (
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
@@ -539,9 +544,9 @@ Save Changes
                         }
                       }}
                     >
-                      {editMode ? "Save" : "Edit"}
+                      View Donations
                     </Button>
-                    <Button
+                    {/* <Button
                       style={{ marginLeft: "5px" }}
                       variant="danger"
                       onClick={() => {
@@ -549,7 +554,7 @@ Save Changes
                       }}
                     >
                       Delete
-                    </Button>
+                    </Button> */}
                   </td>
                 </tr>
               </>
