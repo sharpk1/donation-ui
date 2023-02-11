@@ -133,7 +133,7 @@ const Reports = () => {
 
   // useEffect(() => {
   //   console.log("useEffect");
-  //   getDonationById("BEt9v41FVR9MAeLSvsy9");
+  //   getDonationByMemberId("BEt9v41FVR9MAeLSvsy9");
 
   //   // const getDonations = async () => {
   //   //   const donationCollection = collection(db, "donation");

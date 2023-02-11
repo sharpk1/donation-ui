@@ -1,5 +1,12 @@
 import { db } from "./firebase-config";
-import { doc, query, collection, where, getDocs } from "firebase/firestore";
+import {
+  doc,
+  query,
+  collection,
+  where,
+  getDocs,
+  getDoc,
+} from "firebase/firestore";
 
 export const amountFormatter = (amount) => {
   if (amount === 0) {
@@ -9,7 +16,7 @@ export const amountFormatter = (amount) => {
   }
 };
 
-export const getDonationById = async (id) => {
+export const getDonationByMemberId = async (id) => {
   const categoryDocRef = doc(db, `/members/${id}`);
 
   const q = query(
@@ -41,4 +48,36 @@ export const aggregateCalculator = (data) => {
     total += data[property];
   }
   return amountFormatter(total);
+};
+
+export const getDonationByDonationId = async (id) => {
+  const docRef = doc(db, "donation", id);
+  let response;
+  try {
+    const docSnap = await getDoc(docRef);
+    console.log(docSnap.data());
+    response = docSnap.data();
+  } catch (error) {
+    console.log(error);
+  }
+  console.log(response);
+  return response;
+};
+
+export const getCurrentDate = () => {
+  var today = new Date();
+  var dd = today.getDate();
+
+  var mm = today.getMonth() + 1;
+  var yyyy = today.getFullYear();
+  if (dd < 10) {
+    dd = "0" + dd;
+  }
+
+  if (mm < 10) {
+    mm = "0" + mm;
+  }
+
+  today = mm + "/" + dd + "/" + yyyy;
+  return today;
 };

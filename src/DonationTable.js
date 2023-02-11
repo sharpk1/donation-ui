@@ -34,6 +34,7 @@ const DonationTable = (props) => {
     individualDonations,
     isDonation,
     revisedDonations,
+    donationsRefresh,
   } = props;
 
   console.log("individualDonations: ", individualDonations);
@@ -64,75 +65,6 @@ const DonationTable = (props) => {
     // });
 
     setShow(false);
-  };
-
-  const ModalEdit = (props) => {
-    const { data } = props;
-    console.log(data.donorId.firstName);
-    const newList = individualDonations.filter((donation) => {
-      console.log(donation.donorId.id);
-      console.log(data.donorId.id);
-      return donation.donorId.id === data.donorId.id;
-    });
-
-    return (
-      <Modal show={show} onHide={handleClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>Viewing Donations</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Table striped bordered hover size="sm">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Name</th>
-                <th>Offering</th>
-                <th>Tithes</th>
-                <th>Mission</th>
-                <th>Building Fund</th>
-              </tr>
-            </thead>
-            <tbody>
-              {newList.map((donation, i) => {
-                return (
-                  <tr>
-                    <td>{donation.firstName}</td>
-                    <td>{donation.firstName}</td>
-                    <td>{donation.lastName}</td>
-                    <td>{donation.donationAmount.offering}</td>
-                  </tr>
-                );
-              })}
-              <tr>
-                <td>1</td>
-                <td>Mark</td>
-                <td>Otto</td>
-                <td>@mdo</td>
-              </tr>
-              <tr>
-                <td>2</td>
-                <td>Jacob</td>
-                <td>Thornton</td>
-                <td>@fat</td>
-              </tr>
-              <tr>
-                <td>3</td>
-                <td colSpan={2}>Larry the Bird</td>
-                <td>@twitter</td>
-              </tr>
-            </tbody>
-          </Table>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Close
-          </Button>
-          {/* <Button variant="primary" onClick={handleClose}>
-Save Changes
-</Button> */}
-        </Modal.Footer>
-      </Modal>
-    );
   };
 
   const extractMember = (data) => {
@@ -264,10 +196,12 @@ Save Changes
             buildingFund: editDonationData.donationAmount.buildingFund,
           },
         },
-        console.log("donation updated")
+        setEditModalShow(!editModalShow)
       ).catch((error) => {
         console.error(error.message);
       });
+
+      donationsRefresh();
     };
 
     return (
@@ -354,7 +288,16 @@ Save Changes
                     onSaveHandler();
                     // Push();
                   }}
-                  // disabled={selectedMember.donorId === ""}
+                  disabled={
+                    editDonationData.donationAmount.offering ===
+                      data.data.donationAmount.offering &&
+                    editDonationData.donationAmount.tithes ===
+                      data.data.donationAmount.tithes &&
+                    editDonationData.donationAmount.mission ===
+                      data.data.donationAmount.mission &&
+                    editDonationData.donationAmount.buildingFund ===
+                      data.data.donationAmount.buildingFund
+                  }
                   variant="success"
                 >
                   Save
@@ -402,20 +345,6 @@ Save Changes
             if (individualDonations) {
               newList = extractMember(data);
             }
-
-            console.log(newList);
-            // setDonation({
-            //   ...data,
-            //   donationAmount: {
-            //     ...data.donationAmount,
-            //     offering: parseInt(e.target.value),
-            //   },
-            // });
-
-            // Get the donation data, set it to the state,
-            // set the value to the state
-            // set the onchange to the new state when changes are made
-            // Save the donation by keying off the donation ID
             return (
               <>
                 {show && <DonationModal />}
@@ -540,11 +469,10 @@ Save Changes
                           setDonor(data);
                         } else {
                           setEditModalShow(!editModalShow);
-                          // setEditMode(!editMode);
                         }
                       }}
                     >
-                      View Donations
+                      Edit Donations
                     </Button>
                     {/* <Button
                       style={{ marginLeft: "5px" }}

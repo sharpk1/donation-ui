@@ -7,9 +7,16 @@ import Modal from "react-bootstrap/Modal";
 import DonationTable from "./DonationTable";
 import moment from "moment";
 import ComboBox from "./Autocomplete";
-import { getMembers } from "./logic";
+import { getCurrentDate, getMembers } from "./logic";
 import { db } from "./firebase-config";
-import { collection, addDoc, doc } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  doc,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
 
 const Donation = () => {
   const [selectedMember, setSelectedMember] = useState({
@@ -35,6 +42,7 @@ const Donation = () => {
   const [donationId, setDonationId] = useState("");
 
   useEffect(() => {
+    donationsRefresh();
     getMembers()
       .then((result) => {
         const activeMembers = result.filter((member) => {
@@ -90,6 +98,21 @@ const Donation = () => {
     }
   };
 
+  const donationsRefresh = async () => {
+    let tempArray = [];
+    const q = query(
+      collection(db, "donation"),
+      where("donationDate", ">=", new Date(getCurrentDate()))
+    );
+    const snapshot = await getDocs(q);
+    snapshot.forEach((doc) => {
+      // doc.data() is never undefined for query doc snapshots
+      tempArray.push(doc.data());
+      console.log(doc.id, " => ", doc.data());
+    });
+    setNum(tempArray);
+  };
+
   const handleClose = () => {
     // find the element in the array you are changing
 
@@ -109,6 +132,7 @@ const Donation = () => {
 
     setShow(false);
   };
+
   const handleShow = (data) => {
     setDonation({
       firstName: data.firstName,
@@ -232,6 +256,7 @@ const Donation = () => {
         </Row>
       </Form>
       <DonationTable
+        donationsRefresh={donationsRefresh}
         donationData={num}
         handleShow={handleShow}
         isDonation={true}
