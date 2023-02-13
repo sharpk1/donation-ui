@@ -7,7 +7,7 @@ import moment from "moment";
 import Form from "react-bootstrap/Form";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, updateDoc, deleteDoc } from "firebase/firestore";
 import { db } from "./firebase-config";
 
 const DonationTable = (props) => {
@@ -27,6 +27,20 @@ const DonationTable = (props) => {
     },
   });
   const [editModalShow, setEditModalShow] = useState(false);
+  const [deleteModalShow, setDeleteModalShow] = useState(false);
+  const [editDonationData, setEditDonationData] = useState({
+    donorId: "",
+    donationId: "",
+    firstName: "",
+    lastName: "",
+    donationAmount: {
+      offering: 0,
+      tithes: 0,
+      mission: 0,
+      buildingFund: 0,
+    },
+  });
+  const [showDeleteMessage, setShowDeleteMessage] = useState(false);
 
   const {
     donationData,
@@ -154,46 +168,22 @@ Save Changes
   };
 
   const EditDonationModal = (data) => {
-    const [editDonationData, setEditDonationData] = useState({
-      donorId: "",
-      firstName: "",
-      lastName: "",
-      donationAmount: {
-        offering: 0,
-        tithes: 0,
-        mission: 0,
-        buildingFund: 0,
-      },
-    });
-
-    useEffect(() => {
-      setEditDonationData({
-        donorId: data.data.donorId,
-        firstName: data.data.firstName,
-        lastName: data.data.lastName,
-        donationAmount: {
-          offering: data.data.donationAmount.offering,
-          tithes: data.data.donationAmount.tithes,
-          mission: data.data.donationAmount.mission,
-          buildingFund: data.data.donationAmount.buildingFund,
-        },
-      });
-    }, [data]);
+    const [editData, setEditData] = useState(editDonationData);
 
     const handleEditModalClose = () => {
       setEditModalShow(!editModalShow);
     };
 
     const onSaveHandler = async () => {
-      const donationRef = doc(db, "donation", data.data.donationId);
+      const donationRef = doc(db, "donation", editDonationData.donationId);
       await updateDoc(
         donationRef,
         {
           donationAmount: {
-            offering: editDonationData.donationAmount.offering,
-            tithes: editDonationData.donationAmount.tithes,
-            mission: editDonationData.donationAmount.mission,
-            buildingFund: editDonationData.donationAmount.buildingFund,
+            offering: editData.donationAmount.offering,
+            tithes: editData.donationAmount.tithes,
+            mission: editData.donationAmount.mission,
+            buildingFund: editData.donationAmount.buildingFund,
           },
         },
         setEditModalShow(!editModalShow)
@@ -208,7 +198,8 @@ Save Changes
       <Modal show={editModalShow} onHide={handleEditModalClose}>
         <Modal.Header closeButton>
           <Modal.Title>
-            Edit Donation for {data.data.firstName} {data.data.lastName}
+            Edit Donation for {editDonationData.firstName}{" "}
+            {editDonationData.lastName}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -219,12 +210,12 @@ Save Changes
                 <Form.Control
                   type="number"
                   min="0"
-                  value={editDonationData.donationAmount.offering}
+                  value={editData.donationAmount.offering}
                   onChange={(e) => {
-                    setEditDonationData({
-                      ...editDonationData,
+                    setEditData({
+                      ...editData,
                       donationAmount: {
-                        ...editDonationData.donationAmount,
+                        ...editData.donationAmount,
                         offering: parseInt(e.target.value),
                       },
                     });
@@ -236,12 +227,12 @@ Save Changes
                 <Form.Control
                   type="number"
                   min="0"
-                  value={editDonationData.donationAmount.tithes}
+                  value={editData.donationAmount.tithes}
                   onChange={(e) => {
-                    setEditDonationData({
-                      ...editDonationData,
+                    setEditData({
+                      ...editData,
                       donationAmount: {
-                        ...editDonationData.donationAmount,
+                        ...editData.donationAmount,
                         tithes: parseInt(e.target.value),
                       },
                     });
@@ -253,12 +244,12 @@ Save Changes
                 <Form.Control
                   type="number"
                   min="0"
-                  value={editDonationData.donationAmount.mission}
+                  value={editData.donationAmount.mission}
                   onChange={(e) => {
-                    setEditDonationData({
-                      ...editDonationData,
+                    setEditData({
+                      ...editData,
                       donationAmount: {
-                        ...editDonationData.donationAmount,
+                        ...editData.donationAmount,
                         mission: parseInt(e.target.value),
                       },
                     });
@@ -270,12 +261,12 @@ Save Changes
                 <Form.Control
                   type="number"
                   min="0"
-                  value={editDonationData.donationAmount.buildingFund}
+                  value={editData.donationAmount.buildingFund}
                   onChange={(e) => {
-                    setEditDonationData({
-                      ...editDonationData,
+                    setEditData({
+                      ...editData,
                       donationAmount: {
-                        ...editDonationData.donationAmount,
+                        ...editData.donationAmount,
                         buildingFund: parseInt(e.target.value),
                       },
                     });
@@ -290,13 +281,13 @@ Save Changes
                   }}
                   disabled={
                     editDonationData.donationAmount.offering ===
-                      data.data.donationAmount.offering &&
+                      editData.donationAmount.offering &&
                     editDonationData.donationAmount.tithes ===
-                      data.data.donationAmount.tithes &&
+                      editData.donationAmount.tithes &&
                     editDonationData.donationAmount.mission ===
-                      data.data.donationAmount.mission &&
+                      editData.donationAmount.mission &&
                     editDonationData.donationAmount.buildingFund ===
-                      data.data.donationAmount.buildingFund
+                      editData.donationAmount.buildingFund
                   }
                   variant="success"
                 >
@@ -313,6 +304,88 @@ Save Changes
           {/* <Button variant="primary" onClick={handleClose}>
 Save Changes
 </Button> */}
+        </Modal.Footer>
+      </Modal>
+    );
+  };
+
+  const editDataHandler = (data) => {
+    setEditDonationData({
+      donorId: data.donorId,
+      donationId: data.donationId,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      donationAmount: {
+        offering: data.donationAmount.offering,
+        tithes: data.donationAmount.tithes,
+        mission: data.donationAmount.mission,
+        buildingFund: data.donationAmount.buildingFund,
+      },
+    });
+  };
+
+  const handleDeleteModalClose = () => {
+    setDeleteModalShow(!deleteModalShow);
+    setShowDeleteMessage(false);
+    donationsRefresh();
+    setEditDonationData({
+      donorId: "",
+      donationId: "",
+      firstName: "",
+      lastName: "",
+      donationAmount: {
+        offering: 0,
+        tithes: 0,
+        mission: 0,
+        buildingFund: 0,
+      },
+    });
+  };
+
+  const handleDeleteConfirmation = async () => {
+    await deleteDoc(doc(db, "donation", editDonationData.donationId)).then(
+      () => {
+        setShowDeleteMessage(true);
+        console.log("deletion occured");
+      }
+    );
+    setEditDonationData({
+      donorId: "",
+      donationId: "",
+      firstName: "",
+      lastName: "",
+      donationAmount: {
+        offering: 0,
+        tithes: 0,
+        mission: 0,
+        buildingFund: 0,
+      },
+    });
+  };
+
+  const DeleteDonationModal = () => {
+    return (
+      <Modal show={deleteModalShow} onHide={handleDeleteModalClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>
+            Are you sure you want to delete Donation for{" "}
+            {editDonationData.firstName} {editDonationData.lastName}?
+          </Modal.Title>
+        </Modal.Header>
+        {showDeleteMessage ? (
+          <Modal.Body style={{ alignSelf: "center", color: "red" }}>
+            Delete completed!
+          </Modal.Body>
+        ) : null}
+        <Modal.Footer style={{ justifyContent: "space-between" }}>
+          {showDeleteMessage ? null : (
+            <Button variant="danger" onClick={handleDeleteConfirmation}>
+              Yes
+            </Button>
+          )}
+          <Button variant="secondary" onClick={handleDeleteModalClose}>
+            Close
+          </Button>
         </Modal.Footer>
       </Modal>
     );
@@ -349,6 +422,7 @@ Save Changes
               <>
                 {show && <DonationModal />}
                 {editModalShow && <EditDonationModal data={data} />}
+                {<DeleteDonationModal />}
                 <tr>
                   <th scope="row">{"               "}</th>
                   <td>{data.firstName}</td>
@@ -468,21 +542,27 @@ Save Changes
                           setDonorData(individualDonations);
                           setDonor(data);
                         } else {
+                          editDataHandler(data);
                           setEditModalShow(!editModalShow);
                         }
                       }}
                     >
-                      Edit Donations
+                      {isDonation === true
+                        ? "Edit Donation"
+                        : "View Donation(s)"}
                     </Button>
-                    {/* <Button
-                      style={{ marginLeft: "5px" }}
-                      variant="danger"
-                      onClick={() => {
-                        handleShow(data);
-                      }}
-                    >
-                      Delete
-                    </Button> */}
+                    {isDonation === true ? (
+                      <Button
+                        style={{ marginLeft: "5px" }}
+                        variant="danger"
+                        onClick={() => {
+                          editDataHandler(data);
+                          setDeleteModalShow(true);
+                        }}
+                      >
+                        Delete Donation
+                      </Button>
+                    ) : null}
                   </td>
                 </tr>
               </>

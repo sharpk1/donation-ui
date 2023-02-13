@@ -75,6 +75,11 @@ const Donation = () => {
         buildingFund: 0,
       },
     });
+    setSelectedMember({
+      firstName: "",
+      lastName: "",
+      donorId: "",
+    });
   };
 
   const Push = async () => {
@@ -107,9 +112,12 @@ const Donation = () => {
     const snapshot = await getDocs(q);
     snapshot.forEach((doc) => {
       // doc.data() is never undefined for query doc snapshots
-      tempArray.push(doc.data());
+      let newDoc = doc.data();
+      newDoc.donationId = doc.id;
+      tempArray.push(newDoc);
       console.log(doc.id, " => ", doc.data());
     });
+
     setNum(tempArray);
   };
 
@@ -162,8 +170,6 @@ const Donation = () => {
     });
   };
 
-  console.log(num);
-
   return (
     <>
       <div className="reports-header">Donations for {date}</div>
@@ -171,7 +177,7 @@ const Donation = () => {
         <Row className="mb-3" style={{ textAlign: "center" }}>
           <Form.Group as={Col} controlId="formGridMembers">
             <Form.Label>Members</Form.Label>
-            <ComboBox options={options} memberSelect={memberSelect} />
+            <ComboBox options={options} memberSelect={memberSelect} num={num} />
           </Form.Group>
           <Form.Group as={Col} controlId="formGridOffering">
             <Form.Label>Offering</Form.Label>

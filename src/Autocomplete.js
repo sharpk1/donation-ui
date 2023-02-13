@@ -1,28 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 
 const ComboBox = (props) => {
-  const { options, memberSelect } = props;
+  const { options, memberSelect, num } = props;
   const [selectedMember, setSelectedMember] = useState(null);
 
-  // useEffect(() => {
-  //   const close = document.getElementsByClassName(
-  //     "MuiAutocomplete-clearIndicator"
-  //   )[0];
-  //   // Add a Click Event Listener to the button
-  //   // close.addEventListener("click", () => {
-  //   //   alert("Add your Own Functionality Here...");
-  //   // });
-  //   const hey = () => {
-  //     console.log("bruh");
-  //   };
-  //   if (close) {
-  //     close.addEventListener("click", hey, false);
-  //   }
-  // }, [selectedMember]);
-
-  console.log(options);
+  useEffect(() => {
+    setSelectedMember(null);
+  }, [num]);
 
   return (
     <div className="autocomplete-members">
