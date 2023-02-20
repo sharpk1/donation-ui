@@ -60,7 +60,7 @@ export const getDonationByDonationId = async (id) => {
   } catch (error) {
     console.log(error);
   }
-  console.log(response);
+
   return response;
 };
 

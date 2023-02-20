@@ -17,7 +17,10 @@ const Login = (props) => {
       await signIn(email, password);
       navigate("/home");
     } catch (e) {
-      setError(e.message);
+      setError(
+        "There was an error logging. Please check your password or email"
+      );
+      // setError(e.message);
     }
   };
 
@@ -53,8 +56,11 @@ const Login = (props) => {
               Submit
             </button>
           </div>
-          <p className="forgot-password text-right mt-2">
+          {/* <p className="forgot-password text-right mt-2">
             Forgot <a href="#">password?</a>
+          </p> */}
+          <p style={{ color: "red", textAlign: "center", marginTop: "25px" }}>
+            {error}
           </p>
         </div>
       </form>

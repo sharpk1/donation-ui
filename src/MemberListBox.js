@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import DualListBox from "react-dual-listbox";
 import "react-dual-listbox/lib/react-dual-listbox.css";
 import Button from "react-bootstrap/Button";
-import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import { getMembers } from "./logic";
@@ -83,34 +82,8 @@ const MemberListBox = () => {
 
   useEffect(() => {
     refreshMembers();
-    // let inactiveMembers = [];
-    // getMembers()
-    //   .then((result) => {
-    //     result.forEach((donor) => {
-    //       if (donor.isActive === false) {
-    //         inactiveMembers.push(donor.id);
-    //       }
-    //     });
-    //     setSelected(inactiveMembers);
-    //     setOptions(transformOptions(result));
-    //   })
-    //   .catch((err) => {
-    //     console.error(err);
-    //   });
+    // eslint-disable-next-line
   }, []);
-
-  const onSaveHandler = () => {
-    let lastNum = options.at(-1).value + 1;
-    const adjoinedName = firstName + " " + lastName;
-    let tempArray = [...options];
-
-    tempArray.push({
-      value: lastNum,
-      label: adjoinedName,
-    });
-
-    setOptions(tempArray);
-  };
 
   const removeFromSelected = (data, id) => {
     for (var i = 0; i < data.length; i++) {
@@ -148,9 +121,9 @@ const MemberListBox = () => {
 
   return (
     <>
-      <Form className="donation-form">
+      <Form className="add-member-form">
         <Row className="mb-3" style={{ textAlign: "center" }}>
-          <Form.Group as={Col} controlId="formGridFirstName">
+          <Form.Group as={Row} controlId="formGridFirstName">
             <Form.Label>First Name</Form.Label>
             <Form.Control
               type="firstName"
@@ -160,7 +133,7 @@ const MemberListBox = () => {
               }}
             />
           </Form.Group>
-          <Form.Group as={Col} controlId="formGridLastName">
+          <Form.Group as={Row} controlId="formGridLastName">
             <Form.Label>Last Name</Form.Label>
             <Form.Control
               type="lastName"
@@ -170,13 +143,17 @@ const MemberListBox = () => {
               }}
             />
           </Form.Group>
-          <Form.Group as={Col} controlId="saveMember">
+          <Form.Group as={Row} controlId="saveMember">
             <Form.Group
-              as={Col}
-              style={{ textAlign: "left", marginTop: "31px" }}
+              as={Row}
+              style={{ textAlign: "left", paddingTop: "10px", margin: "auto" }}
             >
-              <Button onClick={addMember} variant="success">
-                Save
+              <Button
+                onClick={addMember}
+                variant="success"
+                disabled={firstName === "" || lastName === ""}
+              >
+                Add Member
               </Button>
             </Form.Group>
           </Form.Group>

@@ -39,7 +39,6 @@ const Donation = () => {
       buildingFund: 0,
     },
   });
-  const [donationId, setDonationId] = useState("");
 
   useEffect(() => {
     donationsRefresh();
@@ -111,7 +110,6 @@ const Donation = () => {
     );
     const snapshot = await getDocs(q);
     snapshot.forEach((doc) => {
-      // doc.data() is never undefined for query doc snapshots
       let newDoc = doc.data();
       newDoc.donationId = doc.id;
       tempArray.push(newDoc);
@@ -122,11 +120,6 @@ const Donation = () => {
   };
 
   const handleClose = () => {
-    // find the element in the array you are changing
-
-    // make that change to the object
-
-    // replace that element in the array with the new one
     setDonation({
       firstName: "",
       lastName: "",

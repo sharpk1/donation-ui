@@ -64,6 +64,7 @@ code {
 
 .reports-header {
   font-size: 33px;
+  padding-left: 10px;
 }
 
 .home-header {
@@ -140,4 +141,28 @@ label {
 .edit-donation-form {
   margin-bottom: auto;
   white-space: nowrap;
+}
+
+.rdl-btn.rdl-move.rdl-move-all-right {
+  display: none;
+}
+
+.rdl-btn.rdl-move.rdl-move-all-left {
+  display: none;
+}
+
+.add-member-header {
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+.add-member-form {
+  width: 15%;
+  margin: auto;
+}
+
+.add-member-button {
+  text-align: left;
+  margin: auto;
+  padding-top: 13px;
 }

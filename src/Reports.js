@@ -12,10 +12,8 @@ const Reports = () => {
   const [options, setOptions] = useState([]);
   const startOfMonth = moment().startOf("month").format("YYYY-MM-DD hh:mm");
   const endOfMonth = moment().endOf("month").format("YYYY-MM-DD hh:mm");
-  const [checkbox, setCheckbox] = useState({ check: "member" });
   const [donor, setDonor] = useState(-1);
   const [donation, setDonation] = useState([]);
-  const [donations, setDonations] = useState([]);
   const [dateRange, setDateRange] = useState([
     new Date(startOfMonth),
     new Date(endOfMonth),
@@ -26,10 +24,15 @@ const Reports = () => {
   useEffect(() => {
     const [start, end] = dateRange;
     getDonations(start, end);
+    // eslint-disable-next-line
   }, [donor]);
 
   const onMemberSelect = (e) => {
-    setDonor(e.target.value);
+    if (e.target.value === "-1") {
+      setDonor(-1);
+    } else {
+      setDonor(e.target.value);
+    }
   };
 
   useEffect(() => {
@@ -58,14 +61,10 @@ const Reports = () => {
         }
       }
     }
-    return false; // Nothing found
+    return false;
   };
 
   const getDonations = async (start, end) => {
-    console.log("donor: ", donor);
-    console.log("start: ", start);
-    console.log("end: ", end);
-
     const donationCollection = collection(db, "donation");
     const data = await getDocs(donationCollection);
 
@@ -104,6 +103,7 @@ const Reports = () => {
       }
     });
 
+    // eslint-disable-next-line
     let filtered = tempAr.filter((donation) => {
       if (
         moment(donation.donationDate.toDate()).isSameOrAfter(start, "day") &&
@@ -115,75 +115,21 @@ const Reports = () => {
 
     setRevisedDonations(filtered);
 
-    setDonations(final);
+    // TODO: Removing this because `donations` is not even being used
+    // setDonations(final);
     setIndividualDonations(allDonations);
-    console.log("DONOR: ", donor);
     if (donor !== -1) {
       // THIS IS BEING CHANGED FROM donations.filter to final.filter
       const result = final.filter((donation) => {
         return donation.donorId.id === donor;
       });
-      console.log("RESULT: ", result);
       setDonation(dataFormatter(result));
     } else {
-      console.log("FINAL: ", final);
       setDonation(dataFormatter(final));
     }
   };
 
-  // useEffect(() => {
-  //   console.log("useEffect");
-  //   getDonationByMemberId("BEt9v41FVR9MAeLSvsy9");
-
-  //   // const getDonations = async () => {
-  //   //   const donationCollection = collection(db, "donation");
-  //   //   const data = await getDocs(donationCollection);
-  //   //   const responseContent = data.docs.map((doc) => ({
-  //   //     ...doc.data(),
-  //   //     id: doc.id,
-  //   //   }));
-
-  //   //   const final = [];
-
-  //   //   responseContent.forEach((donation, i) => {
-  //   //     if (getId(final, donation.donorId.id, false)) {
-  //   //       let index = getId(final, donation.donorId.id, true);
-  //   //       for (const property in donation.donationAmount) {
-  //   //         final[index].donationAmount[property] +=
-  //   //           donation.donationAmount[property];
-  //   //       }
-  //   //     } else {
-  //   //       final.push(donation);
-  //   //     }
-  //   //   });
-
-  //   //   setDonations(final);
-  //   // };
-  //   // TODO: send this to a helper method
-  //   const [start, end] = dateRange;
-  //   getDonations(start, end);
-  //   // const result = donations.filter((donation) => {
-  //   //   if (donor !== -1) {
-  //   //     return (
-  //   //       donation.donationDate.toDate() >= new Date(start) &&
-  //   //       donation.donationDate.toDate() <= new Date(end) &&
-  //   //       donation.donorId.id === donor
-  //   //     );
-  //   //   } else {
-  //   //     return (
-  //   //       moment(donation.donationDate) >= new Date(startOfMonth) &&
-  //   //       moment(donation.donationDate) <= new Date(endOfMonth)
-  //   //     );
-  //   //   }
-  //   // });
-  //   // console.log(result);
-
-  //   // setDonation(dataFormatter(result));
-
-  //   // getMembers();
-  // }, [donor, checkbox.check]);
-
-  const SelectBasicExample = () => {
+  const ReportsMemberSelectBox = () => {
     return (
       <Form.Select
         onChange={(e) => {
@@ -193,8 +139,8 @@ const Reports = () => {
         aria-label="Default select example"
         value={donor}
       >
-        <option disabled value={-1} key={-1}>
-          Member List
+        <option value={-1} key={-1}>
+          All Members
         </option>
         {options?.map((donor) => {
           return (
@@ -204,43 +150,6 @@ const Reports = () => {
           );
         })}
       </Form.Select>
-    );
-  };
-
-  const CheckExample = () => {
-    const { check } = checkbox;
-
-    // Reset the table
-    // Remove who was the member from the state
-    const handleChange = (e) => {
-      e.persist();
-      setDonations([]);
-      setDonor(-1);
-      setCheckbox((prevState) => ({
-        ...prevState,
-        check: e.target.value,
-      }));
-    };
-
-    return (
-      <Form className="radio-group">
-        <Form.Check
-          value={"member"}
-          type={"radio"}
-          id={`member-radio`}
-          label={`Reports by Member`}
-          onChange={handleChange}
-          checked={check === "member"}
-        />
-        <Form.Check
-          value={"timeframe"}
-          type={"radio"}
-          id={`timeframe-radio`}
-          label={`Reports by Timeframe`}
-          onChange={handleChange}
-          checked={check === "timeframe"}
-        />
-      </Form>
     );
   };
 
@@ -262,70 +171,38 @@ const Reports = () => {
     <div>
       <Navbar />
       <div className="reports-header">Reports</div>
-      <CheckExample />
-      {checkbox.check === "member" && (
-        <>
-          <div className="member-info">
-            <SelectBasicExample />
-            <DateRangePicker
-              format={"MM/dd/yyyy"}
-              onClean={() => {
-                setDateRange([null, null]);
-              }}
-              value={dateRange}
-              onOk={dateRangeHandler}
-              className="datepicker-member"
-            />
-            <Button variant="primary" style={{ marginRight: "5px" }}>
-              Get Data
-            </Button>
-            <Button
-              variant="danger"
-              onClick={() => {
-                setDonor(-1);
-                setDonation([]);
-                setDateRange([null, null]);
-              }}
-            >
-              Clear Filters
-            </Button>
-          </div>
-          <DonationTable
-            revisedDonations={revisedDonations}
-            isDonation={false}
-            donationData={donation}
-            donorSelected={donor}
-            individualDonations={individualDonations}
-          />
-        </>
-      )}
-      {checkbox.check === "timeframe" && (
-        <>
-          <div className="member-info">
-            <DateRangePicker
-              format={"MM/dd/yyyy"}
-              onClean={() => {
-                setDateRange([null, null]);
-              }}
-              value={dateRange}
-              onOk={dateRangeHandler}
-              className="datepicker-member"
-            />
-            <Button variant="primary">Get Data</Button>
-            <Button
-              variant="danger"
-              onClick={() => {
-                setDonor(-1);
-                setDonation([]);
-                setDateRange([null, null]);
-              }}
-            >
-              Clear Filters
-            </Button>
-          </div>
-          <DonationTable donationData={donation} isDonation={false} />
-        </>
-      )}
+      <div className="member-info">
+        <ReportsMemberSelectBox />
+        <DateRangePicker
+          format={"MM/dd/yyyy"}
+          onClean={() => {
+            setDateRange([null, null]);
+          }}
+          value={dateRange}
+          onOk={dateRangeHandler}
+          className="datepicker-member"
+        />
+        <Button variant="primary" style={{ marginRight: "5px" }}>
+          Get Data
+        </Button>
+        <Button
+          variant="danger"
+          onClick={() => {
+            setDonor(-1);
+            setDonation([]);
+            setDateRange([null, null]);
+          }}
+        >
+          Clear Filters
+        </Button>
+      </div>
+      <DonationTable
+        revisedDonations={revisedDonations}
+        isDonation={false}
+        donationData={donation}
+        donorSelected={donor}
+        individualDonations={individualDonations}
+      />
     </div>
   );
 };

@@ -6,7 +6,7 @@ const Members = () => {
   return (
     <>
       <Navbar />
-      <h1>Members</h1>
+      <div className="reports-header">Members</div>
       <MemberListBox />
     </>
   );
